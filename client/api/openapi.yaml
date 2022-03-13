@@ -1,0 +1,24 @@
+openapi: 3.0.1
+info:
+  title: OpenAPI definition
+  version: v0
+servers:
+- description: Generated server url
+  url: http://localhost:8080
+paths:
+  /:
+    get:
+      operationId: test
+      responses:
+        "200":
+          content:
+            '*/*':
+              schema:
+                type: string
+          description: OK
+      tags:
+      - test-controller
+      x-accepts: '*/*'
+components:
+  schemas: {}
+
