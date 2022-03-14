@@ -2,7 +2,7 @@ name: API client publish to Reposilite
 
 on:
   push:
-    branches: [ main ]
+    branches: [ qa ]
 
 jobs:
   publish:
@@ -20,4 +20,4 @@ jobs:
       - name: Make script executable
         run: chmod +x .github/workflows/publish.sh
       - name: Publish to Reposilite
-        run: ./.github/workflows/publish.sh
+        run: ./.github/workflows/publish.sh -qa

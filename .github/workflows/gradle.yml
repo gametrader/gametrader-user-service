@@ -10,6 +10,8 @@ name: Build
 on:
   pull_request:
     branches: [ main, dev, qa, release ]
+  push:
+    branches: [ main, dev, qa, release ]
 
 jobs:
   build:

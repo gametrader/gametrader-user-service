@@ -100,7 +100,7 @@ openApiGenerate {
     def desc = "$projectName-rest-client".toString()
     generatorName = 'java'
     library = 'resttemplate'
-    inputSpec = "$rootDir/src/main/resources/open-api/gametrader-user-service.json".toString() //src/main/resources/open-api/$jsonGeneratorFileName".toString()
+    inputSpec = "$rootDir/src/main/resources/open-api/$jsonGeneratorFileName".toString() //src/main/resources/open-api/$jsonGeneratorFileName".toString()
     templateDir = "$rootDir/src/main/resources/open-api/template".toString()
     outputDir = "$rootDir/client".toString()
     apiPackage = "$clientBasePackage".toString()
