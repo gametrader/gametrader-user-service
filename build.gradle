@@ -47,6 +47,9 @@ dependencies {
     //testImplementation 'org.springframework.security:spring-security-test'
 }
 
+build {
+    dependsOn jacocoTestCoverageVerification
+}
 
 tasks.named('test') {
     useJUnitPlatform()
@@ -70,23 +73,20 @@ jacocoTestReport {
 
 jacocoTestCoverageVerification {
     violationRules {
-        rule {
-            limit {
-                minimum = 0.8
-            }
-        }
 
         rule {
             enabled = true
             element = 'CLASS'
             includes = ['com.gametrader.*']
             excludes = ['com.gametrader.gametraderuserservice.GametraderUserServiceApplication',
-                        'com.gametrader.gametraderuserservice.config.*']
+                        'com.gametrader.gametraderuserservice.config.*',
+                        'com.gametrader.gametraderuserservice.controller.TestController'
+            ]
 
             limit {
                 counter = 'LINE'
-                value = 'TOTALCOUNT'
-                maximum = 1.0
+                value = 'COVEREDRATIO'
+                minimum = 0.8
             }
         }
     }
