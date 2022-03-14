@@ -16,6 +16,6 @@ jobs:
           java-version: '11'
           distribution: 'temurin'
       - name: Make gradlew executable
-        run: chmod +x ./client/gradlew
+        run: chmod +x ./client/gradlew.bat
       - name: Publish to Reposilite
-        run: ./client/gradlew publish
+        run: ./client/gradlew.bat publish
