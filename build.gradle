@@ -56,7 +56,10 @@ tasks.named('test') {
 }
 
 //heroku task needed for deploy
-task stage(dependsOn: ['build', 'clean'])
+task stage {
+    dependsOn = ['build', 'clean']
+    test.enabled = false
+}
 build.mustRunAfter clean
 
 //jacoco
