@@ -33,7 +33,7 @@ dependencies {
     //implementation 'org.springframework.boot:spring-boot-starter-security'
     implementation 'org.springframework.boot:spring-boot-starter-web'
     implementation 'org.mapstruct:mapstruct:1.4.2.Final'
-    implementation 'org.flywaydb:flyway-core'
+    //implementation 'org.flywaydb:flyway-core'
     implementation 'org.springdoc:springdoc-openapi-ui:1.6.6'
 
     compileOnly 'org.projectlombok:lombok'
@@ -123,4 +123,12 @@ openApiGenerate {
             serializationLibrary : "jackson",
             enableBuilderSuport : "true"
     ]
+}
+
+//flyway
+flyway {
+    url = "jdbc:$System.env.DATABASE_URL"
+    user = "$System.env.DATABASE_USERNAME"
+    password = "$System.env.DATABASE_PASSWORD"
+    schemas = ['public']
 }
