@@ -14,10 +14,13 @@ import java.util.List;
 public class JwtUtils {
 
     private final Algorithm algorithm;
+    private static final int ACCESS_TOKEN_TIME = 2700000;
+    private static final int REFRESH_TOKEN_TIME = 432000000;
 
+    private final static String SECRET = System.getenv("SECRET");
 
     public JwtUtils() {
-        this.algorithm = Algorithm.HMAC384("secret".getBytes());
+        this.algorithm = Algorithm.HMAC384(SECRET.getBytes());
     }
 
     public DecodedJWT decodeJwt(String token) {
@@ -30,7 +33,7 @@ public class JwtUtils {
     public String createAccessToken(String username, String issuerUrl, List<?> claims) {
         return JWT.create()
                 .withSubject(username)
-                .withExpiresAt(new Date(System.currentTimeMillis() + 2700000))
+                .withExpiresAt(new Date(System.currentTimeMillis() + ACCESS_TOKEN_TIME))
                 .withIssuer(issuerUrl)
                 .withClaim("roles", String.valueOf(claims))
                 .sign(this.algorithm);
@@ -39,7 +42,7 @@ public class JwtUtils {
     public String createRefreshToken(String username, String issuerUrl) {
         return JWT.create().
                 withSubject(username)
-                .withExpiresAt(new Date(System.currentTimeMillis() + 432000000))
+                .withExpiresAt(new Date(System.currentTimeMillis() + REFRESH_TOKEN_TIME))
                 .withIssuer(issuerUrl)
                 .sign(algorithm);
     }
