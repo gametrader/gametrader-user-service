@@ -32,7 +32,7 @@ public class AppUserController {
     }
 
     @PostMapping("/register")
-    public ResponseEntity<?> registerUser(@Valid @RequestBody AppUserDTO registerRequest) throws PasswordsDontMatchException,
+    public ResponseEntity<?> registerUser( @RequestBody AppUserDTO registerRequest) throws PasswordsDontMatchException,
             EmailAlreadyTakenException, UsernameAlreadyTakenException {
         appUserService.register(registerRequest);
         return new ResponseEntity<>(HttpStatus.CREATED);
