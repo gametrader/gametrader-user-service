@@ -70,11 +70,12 @@ gradle.taskGraph.whenReady {
 
 //heroku task needed for deploy
 task stage {
-    dependsOn build
-    dependsOn clean
-
-    // test.enabled = false
-
+    dependsOn = ['build', 'clean']
+}
+tasks.whenTaskAdded {task ->
+    if (task.name.contains("stage")) {
+        test.enabled = false
+    }
 }
 build.mustRunAfter clean
 
