@@ -30,7 +30,7 @@ public class CustomAuthenticationFilter extends UsernamePasswordAuthenticationFi
     @Override
     public Authentication attemptAuthentication(HttpServletRequest request, HttpServletResponse response) throws AuthenticationException {
 
-
+        response.addHeader("Access-Control-Allow-Origin", "*");
         Map<String, String> requestPayload = new HashMap<>();
         try {
             requestPayload = new ObjectMapper().readValue(request.getInputStream(), Map.class);
@@ -44,6 +44,7 @@ public class CustomAuthenticationFilter extends UsernamePasswordAuthenticationFi
 
     @Override
     protected void successfulAuthentication(HttpServletRequest request, HttpServletResponse response, FilterChain chain, Authentication authResult) throws IOException, ServletException {
+        response.addHeader("Access-Control-Allow-Origin", "*");
         User user = (User) authResult.getPrincipal();
         String requestUrl = request.getRequestURL().toString();
         String accessToken = jwtUtils.createAccessToken(user.getUsername(), requestUrl,

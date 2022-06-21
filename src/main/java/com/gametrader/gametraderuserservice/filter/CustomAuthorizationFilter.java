@@ -31,6 +31,8 @@ public class CustomAuthorizationFilter extends OncePerRequestFilter {
 
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException, IOException {
+
+        response.addHeader("Access-Control-Allow-Origin", "*");
         if (request.getServletPath().equals("/api/login") || request.getServletPath().equals("/api/auth/token/refresh")) {
             filterChain.doFilter(request, response);
         } else {
@@ -62,6 +64,6 @@ public class CustomAuthorizationFilter extends OncePerRequestFilter {
 
     @Override //TALK WHAT SHOULD NOT BE FILTERED !
     protected boolean shouldNotFilter(HttpServletRequest request) throws ServletException {
-        return request.getRequestURI().equals("/login");
+        return request.getRequestURI().contains("/login");
     }
 }
