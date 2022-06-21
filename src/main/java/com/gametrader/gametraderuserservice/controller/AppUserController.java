@@ -22,7 +22,8 @@ import java.util.Map;
 import static org.springframework.http.HttpHeaders.AUTHORIZATION;
 
 @RestController
-@RequestMapping("/api/v1/auth")
+@RequestMapping("/v1/api/auth")
+@CrossOrigin
 public class AppUserController {
 
     private final AppUserService appUserService;
