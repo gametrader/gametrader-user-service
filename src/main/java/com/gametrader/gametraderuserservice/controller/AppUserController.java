@@ -22,7 +22,7 @@ import java.util.Map;
 import static org.springframework.http.HttpHeaders.AUTHORIZATION;
 
 @RestController
-@RequestMapping("/v1/api/auth")
+@RequestMapping("/api/v1/auth")
 public class AppUserController {
 
     private final AppUserService appUserService;
