@@ -1,6 +1,7 @@
 package com.gametrader.gametraderuserservice.filter;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.gametrader.gametraderuserservice.model.AppUser;
 import com.gametrader.gametraderuserservice.util.JwtUtils;
 import lombok.AllArgsConstructor;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -24,35 +25,41 @@ import java.util.stream.Collectors;
 @AllArgsConstructor
 
 public class CustomAuthenticationFilter extends UsernamePasswordAuthenticationFilter {
-    private final AuthenticationManager authenticationManager;
-    private final JwtUtils jwtUtils;
+  private final AuthenticationManager authenticationManager;
+  private final JwtUtils jwtUtils;
 
-    @Override
-    public Authentication attemptAuthentication(HttpServletRequest request, HttpServletResponse response) throws AuthenticationException {
+  @Override
+  public Authentication attemptAuthentication(HttpServletRequest request,
+                                              HttpServletResponse response)
+      throws AuthenticationException {
 
-        Map<String, String> requestPayload = new HashMap<>();
-        try {
-            requestPayload = new ObjectMapper().readValue(request.getInputStream(), Map.class);
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
 
-        UsernamePasswordAuthenticationToken authenticationToken = new UsernamePasswordAuthenticationToken(requestPayload.get("username"), requestPayload.get("password"));
-        return authenticationManager.authenticate(authenticationToken);
+    Map<String, String> requestPayload = new HashMap<>();
+    try {
+      requestPayload = new ObjectMapper().readValue(request.getInputStream(), Map.class);
+    } catch (IOException e) {
+      e.printStackTrace();
     }
 
-    @Override
-    protected void successfulAuthentication(HttpServletRequest request, HttpServletResponse response, FilterChain chain, Authentication authResult) throws IOException, ServletException {
-        User user = (User) authResult.getPrincipal();
-        String requestUrl = request.getRequestURL().toString();
-        String accessToken = jwtUtils.createAccessToken(user.getUsername(), requestUrl,
-                user.getAuthorities().stream().map(GrantedAuthority::getAuthority).collect(Collectors.toList())
-        );
-        String refreshToken = jwtUtils.createRefreshToken(user.getUsername(), request.getRequestURL().toString());
-        response.addHeader("Access-Control-Allow-Origin", "*");
-        response.setHeader("access_token", accessToken);
-        response.setHeader("refresh_token", refreshToken);
-        Map<String, String> body = Map.of("access_token", accessToken, "refresh_token", refreshToken);
-        new ObjectMapper().writeValue(response.getOutputStream(), body);
-    }
+    UsernamePasswordAuthenticationToken authenticationToken =
+        new UsernamePasswordAuthenticationToken(requestPayload.get("username"),
+            requestPayload.get("password"));
+    return authenticationManager.authenticate(authenticationToken);
+  }
+
+  @Override
+  protected void successfulAuthentication(HttpServletRequest request, HttpServletResponse response,
+                                          FilterChain chain, Authentication authResult)
+      throws IOException, ServletException {
+    User user = (User) authResult.getPrincipal();
+    String requestUrl = request.getRequestURL().toString();
+    AppUser appUser = (AppUser) authResult.getPrincipal();
+    String accessToken = jwtUtils.createAccessToken(user.getUsername(), requestUrl,
+        user.getAuthorities().stream().map(GrantedAuthority::getAuthority)
+            .collect(Collectors.toList()),appUser.getId());
+    String refreshToken =
+        jwtUtils.createRefreshToken(user.getUsername(), request.getRequestURL().toString());
+    response.setHeader("access_token", accessToken);
+    response.setHeader("refresh_token", refreshToken);
+  }
 }

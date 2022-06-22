@@ -39,12 +39,13 @@ public class JwtUtils {
     }
 
 
-    public String createAccessToken(String username, String issuerUrl, List<?> claims) {
+    public String createAccessToken(String username, String issuerUrl, List<?> claims,Long userID) {
         return JWT.create()
                 .withSubject(username)
                 .withExpiresAt(new Date(System.currentTimeMillis() + ACCESS_TOKEN_TIME))
                 .withIssuer(issuerUrl)
                 .withClaim("roles", String.valueOf(claims))
+                .withClaim("userId", userID)
                 .sign(this.algorithm);
     }
 
