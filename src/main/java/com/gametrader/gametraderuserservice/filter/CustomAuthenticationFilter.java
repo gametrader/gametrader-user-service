@@ -55,13 +55,17 @@ public class CustomAuthenticationFilter extends UsernamePasswordAuthenticationFi
       throws IOException, ServletException {
     User user = (User) authResult.getPrincipal();
     String requestUrl = request.getRequestURL().toString();
-    AppUser appUser = appUserRepository.findAppUserByUsername(((User) authResult.getPrincipal()).getUsername()).get();
+    AppUser appUser =
+        appUserRepository.findAppUserByUsername(((User) authResult.getPrincipal()).getUsername())
+            .get();
     String accessToken = jwtUtils.createAccessToken(user.getUsername(), requestUrl,
         user.getAuthorities().stream().map(GrantedAuthority::getAuthority)
-            .collect(Collectors.toList()),appUser.getId());
+            .collect(Collectors.toList()), appUser.getId());
     String refreshToken =
         jwtUtils.createRefreshToken(user.getUsername(), request.getRequestURL().toString());
     response.setHeader("access_token", accessToken);
     response.setHeader("refresh_token", refreshToken);
+    Map<String, String> body = Map.of("access_token", accessToken, "refresh_token", refreshToken);
+    new ObjectMapper().writeValue(response.getOutputStream(), body);
   }
 }
