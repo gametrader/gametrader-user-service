@@ -56,7 +56,8 @@ public class CustomAuthorizationFilter extends OncePerRequestFilter {
                 }
 
             } else {
-                response.addHeader("Access-Control-Allow-Origin", "*");
+                response.setHeader("Access-Control-Allow-Origin", "*");
+                response.setHeader("Access-Control-Allow-Headers", "content-type");
                 filterChain.doFilter(request, response);
             }
         }
