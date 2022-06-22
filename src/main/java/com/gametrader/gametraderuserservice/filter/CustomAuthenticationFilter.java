@@ -2,6 +2,7 @@ package com.gametrader.gametraderuserservice.filter;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.gametrader.gametraderuserservice.model.AppUser;
+import com.gametrader.gametraderuserservice.repository.AppUserRepository;
 import com.gametrader.gametraderuserservice.util.JwtUtils;
 import lombok.AllArgsConstructor;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -26,6 +27,7 @@ import java.util.stream.Collectors;
 
 public class CustomAuthenticationFilter extends UsernamePasswordAuthenticationFilter {
   private final AuthenticationManager authenticationManager;
+  private final AppUserRepository appUserRepository;
   private final JwtUtils jwtUtils;
 
   @Override
@@ -53,7 +55,7 @@ public class CustomAuthenticationFilter extends UsernamePasswordAuthenticationFi
       throws IOException, ServletException {
     User user = (User) authResult.getPrincipal();
     String requestUrl = request.getRequestURL().toString();
-    AppUser appUser = (AppUser) authResult.getPrincipal();
+    AppUser appUser = appUserRepository.findAppUserByUsername(((User) authResult.getPrincipal()).getUsername()).get();
     String accessToken = jwtUtils.createAccessToken(user.getUsername(), requestUrl,
         user.getAuthorities().stream().map(GrantedAuthority::getAuthority)
             .collect(Collectors.toList()),appUser.getId());
