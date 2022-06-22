@@ -28,65 +28,69 @@ import java.util.stream.Collectors;
 @AllArgsConstructor
 public class AppUserService {
 
-    private final AppUserRepository appUserRepository;
-    private final AppUserMapper appUserMapper;
-    private final PasswordEncoder passwordEncoder;
-    private final UserRoleRepository roleRepository;
-    private final JwtUtils jwtUtils;
+  private final AppUserRepository appUserRepository;
+  private final AppUserMapper appUserMapper;
+  private final PasswordEncoder passwordEncoder;
+  private final UserRoleRepository roleRepository;
+  private final JwtUtils jwtUtils;
 
-    @Transactional
-    public void register(AppUserDTO registerRequest) throws EmailAlreadyTakenException, UsernameAlreadyTakenException, PasswordsDontMatchException {
+  @Transactional
+  public void register(AppUserDTO registerRequest)
+      throws EmailAlreadyTakenException, UsernameAlreadyTakenException,
+      PasswordsDontMatchException {
 
-        if (appUserRepository.existsAppUserByEmail(registerRequest.getEmail())) {
-            throw new EmailAlreadyTakenException(registerRequest.getEmail());
-        }
-
-        if (appUserRepository.existsAppUserByUsername(registerRequest.getUsername())) {
-            throw new UsernameAlreadyTakenException(registerRequest.getUsername());
-        }
-        if (!passwordsMatch(registerRequest.getPassword(), registerRequest.getMatchingPassword())) {
-            throw new PasswordsDontMatchException();
-        }
-
-        AppUser registeredUser = appUserMapper.toEntity(registerRequest);
-        registeredUser.setPassword(passwordEncoder.encode(registerRequest.getPassword()));
-
-
-        addRoleToNewUser(registeredUser);
-        appUserMapper.toDto(appUserRepository.save(registeredUser));
+    if (appUserRepository.existsAppUserByEmail(registerRequest.getEmail())) {
+      throw new EmailAlreadyTakenException(registerRequest.getEmail());
     }
 
-
-    private boolean passwordsMatch(String password, String matchingPassword) {
-        return password.equals(matchingPassword);
+    if (appUserRepository.existsAppUserByUsername(registerRequest.getUsername())) {
+      throw new UsernameAlreadyTakenException(registerRequest.getUsername());
+    }
+    if (!passwordsMatch(registerRequest.getPassword(), registerRequest.getMatchingPassword())) {
+      throw new PasswordsDontMatchException();
     }
 
-    public Map<String, String> refreshToken(String authorizationHeader, String issuer, String refreshToken) {
-        DecodedJWT decodedJWT = jwtUtils.decodeJwt(authorizationHeader);
-        AppUser user = getUser(decodedJWT.getSubject());
-        List<String> userRoles = user.getUserRoles()
-                .stream()
-                .map(role -> role.getRole().name()).
-                collect(Collectors.toList());
-        String accessToken = jwtUtils.createAccessToken(user.getUsername(),
-                issuer,
-                userRoles
-        );
-        Map<String, String> tokens = new HashMap<>();
-        tokens.put("access_token", accessToken);
-        tokens.put("refresh_token", refreshToken);
-        return tokens;
-    }
+    AppUser registeredUser = appUserMapper.toEntity(registerRequest);
+    registeredUser.setPassword(passwordEncoder.encode(registerRequest.getPassword()));
 
-    private AppUser getUser(String username) {
-        return appUserRepository.findAppUserByUsername(username).orElseThrow(() -> {
-            throw new NoSuchElementException(String.format("User: %s not found", username));
-        });
 
-    }
+    addRoleToNewUser(registeredUser);
+    appUserMapper.toDto(appUserRepository.save(registeredUser));
+  }
 
-    private void addRoleToNewUser(AppUser user) {
-        final UserRole userRole = roleRepository.getByRole(Role.USER);
-        user.getUserRoles().add(userRole);
-    }
+
+  private boolean passwordsMatch(String password, String matchingPassword) {
+    return password.equals(matchingPassword);
+  }
+
+  public Map<String, String> refreshToken(String authorizationHeader, String issuer,
+                                          String refreshToken) {
+    DecodedJWT decodedJWT = jwtUtils.decodeJwt(authorizationHeader);
+    AppUser user = getUser(decodedJWT.getSubject());
+    List<String> userRoles = user.getUserRoles()
+        .stream()
+        .map(role -> role.getRole().name()).
+        collect(Collectors.toList());
+    String accessToken = jwtUtils.createAccessToken(user.getUsername(),
+        issuer,
+        userRoles,
+        1L
+    );
+    Map<String, String> tokens = new HashMap<>();
+    tokens.put("access_token", accessToken);
+    tokens.put("refresh_token", refreshToken);
+    return tokens;
+  }
+
+  private AppUser getUser(String username) {
+    return appUserRepository.findAppUserByUsername(username).orElseThrow(() -> {
+      throw new NoSuchElementException(String.format("User: %s not found", username));
+    });
+
+  }
+
+  private void addRoleToNewUser(AppUser user) {
+    final UserRole userRole = roleRepository.getByRole(Role.USER);
+    user.getUserRoles().add(userRole);
+  }
 }
